@@ -17,10 +17,16 @@ struct ContentView: View {
         VStack {
             Spacer()
             if !done, actions.indices.contains(currentIndex) {
-                Text("namn: \(actions[currentIndex].name)")
-                    .font(.headline)
-                    .transition(.opacity)
-                    .id(currentIndex)
+                VStack(spacing: 8) {
+                    Text("namn: \(actions[currentIndex].name)")
+                        .transition(.opacity)
+                        .id(currentIndex)
+                        .frame(maxWidth: .infinity, alignment: .leading)
+
+                    ProgressView(value: Double(currentIndex + 1), total: Double(actions.count))
+                        .animation(.easeInOut, value: currentIndex)
+                }
+                .padding()
             }
         }
         .padding(.bottom, 40)
