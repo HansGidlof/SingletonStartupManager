@@ -9,6 +9,11 @@ import SwiftUI
 
 @main
 struct SingletonStartupManagerApp: App {
+
+    init() {
+        Lifecycle.shared.startUp()
+    }
+
     var body: some Scene {
         WindowGroup {
             ContentView()
