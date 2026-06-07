@@ -10,8 +10,11 @@ import SwiftUI
 @main
 struct SingletonStartupManagerApp: App {
 
+    private let consolePanel = ConsolePanel()
+
     init() {
         Lifecycle.shared.startUp()
+        consolePanel.orderFront(nil)
     }
 
     var body: some Scene {

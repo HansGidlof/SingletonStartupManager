@@ -58,7 +58,7 @@ final class Lifecycle {
 
     // MARK: - Configure
 
-    private func configure() {
+    func configure() {
         startUpActions = [
             Action(
                 name: "Logging",
