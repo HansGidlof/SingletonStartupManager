@@ -15,7 +15,7 @@ struct ConsoleWindow: View {
 
     var body: some View {
         Group {
-            if !done, actions.indices.contains(currentIndex) {
+            if actions.indices.contains(currentIndex) {
                 LoadingConsoleView(
                     actionName: actions[currentIndex].name,
                     progress: Double(currentIndex + 1) / Double(actions.count),

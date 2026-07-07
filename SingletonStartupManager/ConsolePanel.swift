@@ -17,6 +17,12 @@ final class ConsolePanel: NSPanel {
             backing: .buffered,
             defer: false
         )
+        titlebarAppearsTransparent = true
+        level = .floating
+        hidesOnDeactivate = false
+        isMovableByWindowBackground = true
+        animationBehavior = .utilityWindow
+        collectionBehavior = [.canJoinAllSpaces, .fullScreenAuxiliary]
         title = "Konsol"
         isFloatingPanel = true
         becomesKeyOnlyIfNeeded = true
@@ -25,5 +31,9 @@ final class ConsolePanel: NSPanel {
         center()
 
         contentView = NSHostingView(rootView: ConsoleWindow())
+    }
+
+    override func performClose(_ sender: Any?) {
+        orderOut(sender)
     }
 }
