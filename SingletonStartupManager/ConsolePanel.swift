@@ -28,12 +28,29 @@ final class ConsolePanel: NSPanel {
         becomesKeyOnlyIfNeeded = true
         isReleasedWhenClosed = false
         isRestorable = false
-        center()
 
         contentView = NSHostingView(rootView: ConsoleWindow())
+
+        // Restore the saved position if there is one; otherwise default to the
+        // bottom-left corner. Moving the panel auto-saves its new position.
+        let autosaveName = NSWindow.FrameAutosaveName("ConsolePanel")
+        let hasSavedPosition = setFrameUsingName(autosaveName)
+        setFrameAutosaveName(autosaveName)
+        if !hasSavedPosition {
+            moveToBottomLeftCorner()
+        }
     }
 
     override func performClose(_ sender: Any?) {
         orderOut(sender)
+    }
+
+    /// Positions the panel in the bottom-left corner of the active screen,
+    /// respecting the Dock and menu bar via `visibleFrame`.
+    private func moveToBottomLeftCorner() {
+        guard let visible = (screen ?? NSScreen.main)?.visibleFrame else { return }
+        let margin: CGFloat = 20
+        let origin = NSPoint(x: visible.minX + margin, y: visible.minY + margin)
+        setFrameOrigin(origin)
     }
 }
