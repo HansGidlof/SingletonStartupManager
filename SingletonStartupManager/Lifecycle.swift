@@ -21,11 +21,18 @@ struct Action: LifecycleProtocol {
     var lastError: Error?
     private let onStartUp: () -> Void
     private let onTearDown: () -> Void
+    private let firstTime: Bool
 
-    init(name: String, onStartUp: @escaping () -> Void, onTearDown: @escaping () -> Void) {
+    init(
+        name: String,
+        onStartUp: @escaping () -> Void,
+        onTearDown: @escaping () -> Void,
+        firstTime: Bool = true
+    ) {
         self.name = name
         self.onStartUp = onStartUp
         self.onTearDown = onTearDown
+        self.firstTime = firstTime
     }
 
     func startUp() {
