@@ -12,8 +12,9 @@ import Foundation
 /// A single sub-step within a `StartupAction` (e.g. "read data").
 /// Steps run in order and are what the console surfaces one at a time.
 struct ActionStep {
-    let name: String
     private let work: () -> Void
+
+    let name: String
 
     init(_ name: String, _ work: @escaping () -> Void) {
         self.name = name

@@ -17,8 +17,9 @@ struct LoadingConsoleView: View {
         VStack(alignment: .leading, spacing: 12) {
 
             // MARK: Title
-            Text("namn: \(actionName)")
+            Text(actionName.isEmpty ? "Klar" : actionName)
                 .font(.headline)
+                .foregroundStyle(actionName.isEmpty ? .secondary : .primary)
                 .frame(maxWidth: .infinity, alignment: .leading)
                 .contentTransition(.numericText())
 
@@ -59,7 +60,7 @@ struct LoadingConsoleView: View {
     VStack {
         Spacer()
         LoadingConsoleView(
-            actionName: "Database",
+            actionName: "Database – read data",
             progress: 0.66,
             errors: ["Error: connection timeout"]
         )
