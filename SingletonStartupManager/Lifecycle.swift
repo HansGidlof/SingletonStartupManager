@@ -14,76 +14,41 @@ protocol LifecycleProtocol {
     func tearDown()
 }
 
-// MARK: - Action
-
-struct Action: LifecycleProtocol {
-    let name: String
-    var lastError: Error?
-    private let onStartUp: () -> Void
-    private let onTearDown: () -> Void
-    private let firstTime: Bool
-
-    init(
-        name: String,
-        onStartUp: @escaping () -> Void,
-        onTearDown: @escaping () -> Void,
-        firstTime: Bool = true
-    ) {
-        self.name = name
-        self.onStartUp = onStartUp
-        self.onTearDown = onTearDown
-        self.firstTime = firstTime
-    }
-
-    func startUp() {
-        onStartUp()
-    }
-
-    func tearDown() {
-        onTearDown()
-    }
-}
-
 // MARK: - Lifecycle
 
 final class Lifecycle {
 
     // MARK: - Shared Instance
 
+    /// The app-wide instance. Tests construct their own instance via `init`
+    /// with a fake `LaunchTracking`.
     static let shared = Lifecycle()
 
     // MARK: - Actions
 
-    var startUpActions: [Action] = []
-    var tearDownActions: [Action] = []
+    var startUpActions: [StartupAction] = []
+    var tearDownActions: [StartupAction] = []
+
+    // MARK: - Dependencies
+
+    /// Knows whether this is the app's first launch. Injected so it can be
+    /// substituted in tests.
+    private let launchTracker: LaunchTracking
 
     // MARK: - Init
 
-    private init() {
+    init(launchTracker: LaunchTracking = LaunchTracker()) {
+        self.launchTracker = launchTracker
         configure()
     }
 
     // MARK: - Configure
 
+    /// Builds the action list for this launch. First-launch-only actions are
+    /// included only when the tracker reports the first launch.
     func configure() {
-        startUpActions = [
-            Action(
-                name: "Logging",
-                onStartUp: { print("Logging started") },
-                onTearDown: { print("Logging stopped") }
-            ),
-            Action(
-                name: "Database",
-                onStartUp: { print("Database connected") },
-                onTearDown: { print("Database disconnected") }
-            ),
-            Action(
-                name: "Network",
-                onStartUp: { print("Network session started") },
-                onTearDown: { print("Network session stopped") }
-            ),
-        ]
-
+        let firstLaunchActions = launchTracker.isFirstLaunch ? ActionRegistry.firstLaunchOnly : []
+        startUpActions = firstLaunchActions + ActionRegistry.everyLaunch
         tearDownActions = startUpActions.reversed()
     }
 
@@ -91,6 +56,10 @@ final class Lifecycle {
 
     func startUp() {
         startUpActions.forEach { $0.startUp() }
+
+        if launchTracker.isFirstLaunch {
+            launchTracker.markLaunched()
+        }
     }
 
     func tearDown() {
