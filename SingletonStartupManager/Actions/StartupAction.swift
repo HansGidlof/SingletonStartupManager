@@ -13,10 +13,14 @@ import Foundation
 /// and is registered in `ActionRegistry`.
 ///
 /// An action does not know *when* it runs — that is decided by which list
-/// it is registered in (`everyLaunch` vs `firstLaunchOnly`).
+/// it is registered in (`everyLaunch` vs `firstLaunchOnly`). It exposes its
+/// work as an ordered list of `steps`, which the console surfaces one at a time.
 protocol StartupAction: LifecycleProtocol {
     /// Human-readable name shown in the console UI.
     var name: String { get }
+
+    /// The ordered sub-steps that make up this action.
+    var steps: [ActionStep] { get }
 
     /// The most recent error produced by the action, if any.
     var lastError: Error? { get }
@@ -26,4 +30,14 @@ protocol StartupAction: LifecycleProtocol {
 
 extension StartupAction {
     var lastError: Error? { nil }
+
+    /// Runs every step in order.
+    func startUp() {
+        steps.forEach { $0.run() }
+    }
+
+    /// Runs the steps in reverse order for symmetry.
+    func tearDown() {
+        steps.reversed().forEach { $0.run() }
+    }
 }

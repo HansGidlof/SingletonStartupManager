@@ -14,11 +14,10 @@ import Foundation
 struct FirstLaunchAction: StartupAction {
     let name = "First Launch Setup"
 
-    func startUp() {
-        print("First launch setup completed")
-    }
-
-    func tearDown() {
-        print("First launch setup torn down")
+    var steps: [ActionStep] {
+        [
+            ActionStep("create defaults") { print("First launch: defaults created") },
+            ActionStep("seed data") { print("First launch: data seeded") },
+        ]
     }
 }

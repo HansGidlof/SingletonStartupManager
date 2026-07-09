@@ -12,11 +12,11 @@ import Foundation
 struct NetworkAction: StartupAction {
     let name = "Network"
 
-    func startUp() {
-        print("Network session started")
-    }
-
-    func tearDown() {
-        print("Network session stopped")
+    var steps: [ActionStep] {
+        [
+            ActionStep("resolve host") { print("Network: host resolved") },
+            ActionStep("open session") { print("Network: session opened") },
+            ActionStep("warm connection") { print("Network: connection warmed") },
+        ]
     }
 }

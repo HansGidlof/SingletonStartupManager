@@ -11,27 +11,43 @@ struct ConsoleWindow: View {
 
     let actions = Lifecycle.shared.startUpActions
     @State private var currentIndex = 0
-    @State private var done = false
+    @State private var progress: Double = 0
+    @State private var errors: [String] = []
+
+    /// All sub-steps across every action, flattened into a single ordered list
+    /// paired with the action they belong to.
+    private var steps: [(action: StartupAction, step: ActionStep)] {
+        actions.flatMap { action in action.steps.map { (action, $0) } }
+    }
+
+    /// Label for the current step, e.g. "Database – read data".
+    private var label: String {
+        guard steps.indices.contains(currentIndex) else { return "" }
+        let current = steps[currentIndex]
+        return "\(current.action.name) – \(current.step.name)"
+    }
 
     var body: some View {
-        Group {
-            if actions.indices.contains(currentIndex) {
-                LoadingConsoleView(
-                    actionName: actions[currentIndex].name,
-                    progress: Double(currentIndex + 1) / Double(actions.count),
-                    errors: actions[currentIndex].lastError.map { [$0.localizedDescription] } ?? []
-                )
-                .frame(maxWidth: .infinity, maxHeight: .infinity)
-            }
-        }
+        LoadingConsoleView(
+            actionName: label,
+            progress: progress,
+            errors: errors
+        )
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
         .animation(.easeInOut, value: currentIndex)
-        .animation(.easeInOut, value: done)
+        .animation(.easeInOut, value: progress)
         .task {
-            for index in actions.indices {
+            let steps = self.steps
+            for index in steps.indices {
                 currentIndex = index
-                try? await Task.sleep(for: .seconds(1.5))
+                errors = steps[index].action.lastError.map { [$0.localizedDescription] } ?? []
+                progress = Double(index + 1) / Double(steps.count)
+                try? await Task.sleep(for: .seconds(0.6))
             }
-            done = true
+
+            // All steps complete: reset the progress bar and clear the log box.
+            progress = 0
+            errors = []
         }
     }
 }

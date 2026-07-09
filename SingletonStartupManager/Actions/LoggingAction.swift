@@ -12,11 +12,10 @@ import Foundation
 struct LoggingAction: StartupAction {
     let name = "Logging"
 
-    func startUp() {
-        print("Logging started")
-    }
-
-    func tearDown() {
-        print("Logging stopped")
+    var steps: [ActionStep] {
+        [
+            ActionStep("open log file") { print("Logging: log file opened") },
+            ActionStep("set level") { print("Logging: level set to debug") },
+        ]
     }
 }

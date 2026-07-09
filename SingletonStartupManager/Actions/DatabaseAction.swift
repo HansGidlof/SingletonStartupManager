@@ -12,11 +12,11 @@ import Foundation
 struct DatabaseAction: StartupAction {
     let name = "Database"
 
-    func startUp() {
-        print("Database connected")
-    }
-
-    func tearDown() {
-        print("Database disconnected")
+    var steps: [ActionStep] {
+        [
+            ActionStep("read data") { print("Database: read data") },
+            ActionStep("write data") { print("Database: write data") },
+            ActionStep("cache") { print("Database: cache warmed") },
+        ]
     }
 }
