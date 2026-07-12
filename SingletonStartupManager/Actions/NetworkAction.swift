@@ -15,8 +15,8 @@ struct NetworkAction: StartupAction {
     var steps: [ActionStep] {
         [
             ActionStep("resolve host") { print("Network: host resolved") },
-            ActionStep("open session") { print("Network: session opened") },
-            ActionStep("warm connection") { throw StepError.failed("timeout vid uppvärmning av anslutning") },
+            ActionStep("open session") { throw StepError.failed("timeout vid uppvärmning av anslutning") },
+            ActionStep("warm connection") { print("Network: session opened") },
         ]
     }
 }
