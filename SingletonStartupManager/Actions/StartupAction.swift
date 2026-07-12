@@ -33,7 +33,9 @@ extension StartupAction {
 
     /// Runs every step in order.
     func startUp() throws {
-        try steps.forEach { try $0.run() }
+        for var step in steps {
+            try step.run()
+        }
     }
 
     /// Runs the steps in reverse order for symmetry.

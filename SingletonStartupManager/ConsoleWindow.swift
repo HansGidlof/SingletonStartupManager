@@ -32,17 +32,23 @@ struct ConsoleWindow: View {
         .task {
             let steps = self.steps
             for index in steps.indices {
-                let current = steps[index]
+                var current = steps[index]
                 title = "\(current.action.name) – \(current.step.name)"
-                errors = current.action.lastError.map { [$0.localizedDescription] } ?? []
+
+                do {
+                    try current.step.run()
+                } catch {
+                    errors.append("\(current.action.name) – \(current.step.name): \(error.localizedDescription)")
+                }
+
                 progress = Double(index + 1) / Double(steps.count)
                 try? await Task.sleep(for: .seconds(0.6))
             }
 
-            // All steps complete: reset the title text, progress bar and log box.
+            // All steps complete: reset the title and progress bar.
+            // Any errors stay in the log box so they remain visible.
             title = ""
             progress = 0
-            errors = []
         }
     }
 }

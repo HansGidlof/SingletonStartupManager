@@ -15,7 +15,7 @@ struct DatabaseAction: StartupAction {
     var steps: [ActionStep] {
         [
             ActionStep("read data") { print("Database: read data") },
-            ActionStep("write data") { print("Database: write data") },
+            ActionStep("write data") { throw URLError(.badURL) },
             ActionStep("cache") { print("Database: cache warmed") },
         ]
     }

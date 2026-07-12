@@ -29,6 +29,10 @@ final class Lifecycle {
     var startUpActions: [StartupAction] = []
     var tearDownActions: [StartupAction] = []
 
+    /// All errors collected during the last `startUp()` / `tearDown()` run.
+    /// Empty when everything succeeded.
+    private(set) var errors: [String] = []
+
     // MARK: - Dependencies
 
     /// Knows whether this is the app's first launch. Injected so it can be
@@ -54,23 +58,32 @@ final class Lifecycle {
 
     // MARK: - Lifecycle
 
+    /// Runs every startup action. Instead of crashing on the first failure,
+    /// every error is collected into `errors` and the remaining actions still run.
     func startUp() {
-        do {
-            try startUpActions.forEach { try $0.startUp() }
-            
-            if launchTracker.isFirstLaunch {
-                launchTracker.markLaunched()
+        errors = []
+        for action in startUpActions {
+            do {
+                try action.startUp()
+            } catch {
+                errors.append(error.localizedDescription)
             }
-        } catch {
-            fatalError(error.localizedDescription)
+        }
+
+        if launchTracker.isFirstLaunch {
+            launchTracker.markLaunched()
         }
     }
 
+    /// Runs every teardown action, collecting errors the same way as `startUp()`.
     func tearDown() {
-        do {
-            try tearDownActions.forEach { try $0.tearDown() }
-        } catch {
-            fatalError(error.localizedDescription)
+        errors = []
+        for action in tearDownActions {
+            do {
+                try action.tearDown()
+            } catch {
+                errors.append(error.localizedDescription)
+            }
         }
     }
     
