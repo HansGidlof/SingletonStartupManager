@@ -12,16 +12,23 @@ import Foundation
 /// A single sub-step within a `StartupAction` (e.g. "read data").
 /// Steps run in order and are what the console surfaces one at a time.
 struct ActionStep {
-    private let work: () -> Void
+    private let work: () throws -> Void
+    private(set) var tearDown: () throws -> Void
 
     let name: String
 
-    init(_ name: String, _ work: @escaping () -> Void) {
+    init(_ name: String, _ work: @escaping () -> Void, _ tearDown: @escaping () -> Void = {}) {
         self.name = name
         self.work = work
+        self.tearDown = tearDown
     }
 
-    func run() {
-        work()
+    func run() throws {
+        try work()
+    }
+    
+    
+    func tear() throws {
+        try tearDown()
     }
 }

@@ -10,8 +10,8 @@ import Foundation
 // MARK: - LifecycleProtocol
 
 protocol LifecycleProtocol {
-    func startUp()
-    func tearDown()
+    func startUp() throws
+    func tearDown() throws
 }
 
 // MARK: - Lifecycle
@@ -55,14 +55,24 @@ final class Lifecycle {
     // MARK: - Lifecycle
 
     func startUp() {
-        startUpActions.forEach { $0.startUp() }
-
-        if launchTracker.isFirstLaunch {
-            launchTracker.markLaunched()
+        do {
+            try startUpActions.forEach { try $0.startUp() }
+            
+            if launchTracker.isFirstLaunch {
+                launchTracker.markLaunched()
+            }
+        } catch {
+            fatalError(error.localizedDescription)
         }
     }
 
     func tearDown() {
-        tearDownActions.forEach { $0.tearDown() }
+        do {
+            try tearDownActions.forEach { try $0.tearDown() }
+        } catch {
+            fatalError(error.localizedDescription)
+        }
     }
+    
+    
 }

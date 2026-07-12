@@ -32,12 +32,12 @@ extension StartupAction {
     var lastError: Error? { nil }
 
     /// Runs every step in order.
-    func startUp() {
-        steps.forEach { $0.run() }
+    func startUp() throws {
+        try steps.forEach { try $0.run() }
     }
 
     /// Runs the steps in reverse order for symmetry.
-    func tearDown() {
-        steps.reversed().forEach { $0.run() }
+    func tearDown() throws {
+        try steps.reversed().forEach { try $0.tearDown() }
     }
 }
